@@ -30,7 +30,18 @@ resource "aws_instance" "blog" {
   }
 }
 
-module "alb" {
+module "autoscaling" {
+  source              = "terraform-aws-modules/autoscaling/aws"
+  name                = "blog"
+  min_size            = 1
+  max_size            = 2
+  vpc_zone_identifier = module.blog_vpc.public_subnets
+  security_groups     = [module.blog_sg.security_group_id]
+  image_id            = "ami-785db401"
+  instance_type       = var.instance_type
+}
+
+module "blog_alb" {
   source = "terraform-aws-modules/alb/aws"
 
   name = "blog-alb"
